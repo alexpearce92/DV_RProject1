@@ -1,0 +1,66 @@
+---
+output: html_document
+---
+Elements Of Data Visualization: Project 1
+===
+In this project, the group familiarizes itself with git, knitr, ggplot, and basic SQL commands to create **interesting** plots of given data. Additionally, we create graphs usings the entire data set via a provided SQL query. 
+
+###First, we create and display data frames for each given table using the following code.
+```{r}
+library('RCurl')
+library('ggplot2')
+
+orders.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from orders"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+
+customers.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from customers"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+
+order_details.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from order_details"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+
+items.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from items"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+
+customers.df
+items.df
+order_details.df
+orders.df
+```
+
+#Now we create "Interesting" graphs:
+```{r}
+ggplot(data = customers.df) + geom_histogram(aes(x = CUSTOMER_STATE))
+```
+
+###Here we can see that most costumers hail from California. How delightfully intriguing. 
+```{r}
+ggplot(items.df, aes(x = ARTIST, y = UNIT_PRICE)) + geom_point()
+```
+
+####And here, It appears some artist price their worth more than others but, no higher than 17 and no less than 13 price units. Quite a fascinating aspect of the data. 
+
+```{r}
+ggplot(data = order_details.df, aes(x = ITEM_ID)) + geom_histogram(binwidth = 1, aes(fill = ..count..))
+```
+
+###Here we see that some item ID's have more individual orders (not accounting for quantity of order), than others. Item ID number one seems to be the hottest commodity! 
+
+```{r}
+months <- as.vector(substr(orders.df$ORDER_DATE,6,7))
+months <- data.frame(months)
+ggplot(data = months) + geom_histogram(aes(x = months ))
+```
+
+###Finally we take a look at the number of orders per month. This was done by some initial data subsetting, followed by the tried and true ggplot function. It appears this company does poorly during September and October. Unfortunate. 
+
+
+#Mandtory graph creation using the provided SQL query:
+```{r}
+set.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from orders o join customers c on o.customer_id = c.customer_id join order_details d on o.order_id = d.order_id join items i on d.item_id = i.item_id"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+
+p <- ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(UNIT_PRICE)))
+p + facet_wrap(~CUSTOMER_STATE)
+
+q <- ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(TITLE)))
+q + facet_wrap(~CUSTOMER_STATE)
+
+z <- ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(ARTIST)))
+z + facet_wrap(~CUSTOMER_STATE)
+```
