@@ -1,0 +1,1 @@
+ggplot(items.df, aes(x = ARTIST, y = UNIT_PRICE)) + geom_point()

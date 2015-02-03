@@ -17,45 +17,36 @@ library('RCurl')
 library('ggplot2')
 ```
 
-####Then we query the database to generate our data frames
+####Then we query the database and generate our data frames
 ```{r}
 source("../01 Data/create_data_frames.R",echo=TRUE)
 ```
 
-####Here are the dataframes we just created
-```{r}
-head(customers.df)
-head(items.df)
-head(order_details.df)
-head(orders.df)
-```
 
 ##Now we create "interesting" graphs:
 
 ####Here we can see that most customers hail from California. How delightfully intriguing. 
 
 ```{r}
-ggplot(data = customers.df) + geom_histogram(aes(x = CUSTOMER_STATE))
+source("../02 Visualizations/interestingplot1.R",echo=TRUE)
 ```
 
 ####And here, It appears some artist price their worth more than others but, no higher than 17 and no less than 13 price units. Quite a fascinating aspect of the data. 
 
 ```{r}
-ggplot(items.df, aes(x = ARTIST, y = UNIT_PRICE)) + geom_point()
+source("../02 Visualizations/interestingplot2.R",echo=TRUE)
 ```
 
 ####Here we see that some item ID's have more individual orders (not accounting for quantity of order), than others. Item ID 1 seems to be the hottest commodity! 
 
 ```{r}
-ggplot(data = order_details.df, aes(x = ITEM_ID)) + geom_histogram(binwidth = 1, aes(fill = ..count..))
+source("../02 Visualizations/interestingplot3.R",echo=TRUE)
 ```
 
 ####Finally we take a look at the number of orders per month. This was done by some initial data subsetting, followed by a ggplot function. It appears this company does poorly during September and October. Unfortunate. 
 
 ```{r}
-months <- as.vector(substr(orders.df$ORDER_DATE,6,7))
-months <- data.frame(months)
-ggplot(data = months) + geom_histogram(aes(x = months ))
+source("../02 Visualizations/interestingplot4.R",echo=TRUE)
 ```
 
 
@@ -68,9 +59,5 @@ source("../01 Data/create_joined_data_frames.R",echo=TRUE)
 
 ####Now let's build some graphs
 ```{r message=F, warning=F}
-ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(UNIT_PRICE))) + facet_wrap(~CUSTOMER_STATE)
-
-ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(TITLE))) + facet_wrap(~CUSTOMER_STATE)
-
-ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(ARTIST))) + facet_wrap(~CUSTOMER_STATE)
+source("../02 Visualizations/recreate_plots.R",echo=TRUE)
 ```
