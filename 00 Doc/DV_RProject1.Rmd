@@ -41,8 +41,6 @@ orders.df
 source("../02 Visualizations/generate_plot_customers.R", echo = TRUE)
 ```
 
-#ggplot(data = customers.df) + geom_histogram(aes(x = CUSTOMER_STATE))
-
 ####And here, It appears some artist price their worth more than others but, no higher than 17 and no less than 13 price units. Quite a fascinating aspect of the data. 
 
 ```{r fig.width=12}
