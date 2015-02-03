@@ -1,1 +1,0 @@
-ggplot(data = order_details.df, aes(x = ITEM_ID)) + geom_histogram(binwidth = 1, aes(fill = ..count..))
