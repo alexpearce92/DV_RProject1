@@ -19,13 +19,10 @@ library('ggplot2')
 
 ####Then we query the database to generate our data frames
 ```{r}
-orders.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from orders"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
-
-customers.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from customers"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
-
-order_details.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from order_details"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
-
-items.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from items"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+source("../01 Data/create_data_frame_customers.R", echo = TRUE)
+source("../01 Data/create_data_frame_items.R", echo = TRUE)
+source("../01 Data/create_data_frame_order_details.R", echo = TRUE)
+source("../01 Data/create_data_frame_orders.R", echo = TRUE)
 ```
 
 ####Here are the dataframes we just created
@@ -40,28 +37,28 @@ orders.df
 
 ####Here we can see that most customers hail from California. How delightfully intriguing. 
 
-```{r}
-ggplot(data = customers.df) + geom_histogram(aes(x = CUSTOMER_STATE))
+```{r fig.width=12}
+source("../02 Visualizations/generate_plot_customers.R", echo = TRUE)
 ```
+
+#ggplot(data = customers.df) + geom_histogram(aes(x = CUSTOMER_STATE))
 
 ####And here, It appears some artist price their worth more than others but, no higher than 17 and no less than 13 price units. Quite a fascinating aspect of the data. 
 
-```{r}
-ggplot(items.df, aes(x = ARTIST, y = UNIT_PRICE)) + geom_point()
+```{r fig.width=12}
+source("../02 Visualizations/generate_plot_items.R", echo = TRUE)
 ```
 
 ####Here we see that some item ID's have more individual orders (not accounting for quantity of order), than others. Item ID 1 seems to be the hottest commodity! 
 
-```{r}
-ggplot(data = order_details.df, aes(x = ITEM_ID)) + geom_histogram(binwidth = 1, aes(fill = ..count..))
+```{r fig.width=12}
+source("../02 Visualizations/generate_plot_order_details.R", echo = TRUE)
 ```
 
 ####Finally we take a look at the number of orders per month. This was done by some initial data subsetting, followed by a ggplot function. It appears this company does poorly during September and October. Unfortunate. 
 
-```{r}
-months <- as.vector(substr(orders.df$ORDER_DATE,6,7))
-months <- data.frame(months)
-ggplot(data = months) + geom_histogram(aes(x = months ))
+```{r fig.width=12}
+source("../02 Visualizations/generate_plot_order_date.R", echo = TRUE)
 ```
 
 
@@ -69,14 +66,12 @@ ggplot(data = months) + geom_histogram(aes(x = months ))
 
 ####We first query the database with our SQL statement
 ```{r}
-set.df <- data.frame(eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from orders o join customers c on o.customer_id = c.customer_id join order_details d on o.order_id = d.order_id join items i on d.item_id = i.item_id"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521/PDB1.usuniversi01134.oraclecloud.internal', USER='DV_ORDERS', PASS='orcl', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'False'), verbose = TRUE), 1, 2^31-1))))
+source("../01 Data/create_data_frame_joined.R", echo = TRUE)
 ```
 
 ####Now let's build some graphs
-```{r message=F, warning=F}
-ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(UNIT_PRICE))) + facet_wrap(~CUSTOMER_STATE)
-
-ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(TITLE))) + facet_wrap(~CUSTOMER_STATE)
-
-ggplot(set.df, aes(x = as.Date(ORDER_DATE, "%Y-%m-%d"), y = as.Date(SHIPPED_DATE,"%Y-%m-%d"))) + geom_point(aes(color = as.factor(ARTIST))) + facet_wrap(~CUSTOMER_STATE)
+```{r fig.width=12}
+source("../02 Visualizations/recreate_plot_1.R", echo = TRUE)
+source("../02 Visualizations/recreate_plot_2.R", echo = TRUE)
+source("../02 Visualizations/recreate_plot_3.R", echo = TRUE)
 ```
