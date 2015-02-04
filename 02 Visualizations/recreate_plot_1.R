@@ -1,1 +1,1 @@
-ggplot(set.df,aes(x=as.Date(ORDER_DATE,"%Y-%m-%d"),y=as.Date(SHIPPED_DATE,"%Y-%m-%d")))+geom_point(aes(color=as.factor(UNIT_PRICE))) + facet_wrap(~CUSTOMER_STATE)
+ggplot(set.df,aes(x=as.Date(ORDER_DATE,"%Y-%m-%d"),y=as.Date(SHIPPED_DATE,"%Y-%m-%d")))+geom_point(aes(color=as.factor(UNIT_PRICE)),na.rm=TRUE) + facet_wrap(~CUSTOMER_STATE)
