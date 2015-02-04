@@ -19,18 +19,15 @@ library('ggplot2')
 
 ####Then we query the database to generate our data frames
 ```{r}
-source("../01 Data/create_data_frame_customers.R", echo = TRUE)
-source("../01 Data/create_data_frame_items.R", echo = TRUE)
-source("../01 Data/create_data_frame_order_details.R", echo = TRUE)
-source("../01 Data/create_data_frame_orders.R", echo = TRUE)
+source("../01 Data/create_data_frames.R", echo = TRUE)
 ```
 
 ####Here are the dataframes we just created
 ```{r}
-customers.df
-items.df
-order_details.df
-orders.df
+head(customers.df)
+head(items.df)
+head(order_details.df)
+head(orders.df)
 ```
 
 ##Now we create "interesting" graphs:
